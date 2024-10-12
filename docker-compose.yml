@@ -10,18 +10,42 @@ services:
     depends_on:
       - postgres
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
       - ./server:/app
+    networks:
+      - recetarium
     env_file:
       - ./server/.env
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    command: yarn start
+    depends_on:
+      - server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+    networks:
+      - recetarium
+    env_file:
+      - ./client/.env
 
   postgres:
     image: postgres:16-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - recetarium
     ports:
       - ${RECETARIUM_PG_PORT:-5432}:5432
     environment:
       POSTGRES_PASSWORD: Recetarium
 
+
+networks:
+  recetarium:
+    driver: bridge

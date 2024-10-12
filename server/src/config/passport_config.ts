@@ -1,8 +1,17 @@
-import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
+import { Strategy, StrategyOptions } from 'passport-jwt';
+import { Request } from 'express';
 import client from './client';
 
+const cookieExtractor = (request: Request) => {
+  let token = null;
+  if (request && request.cookies) {
+    token = request.cookies.token; 
+  }
+  return token;
+};
+
 const options : StrategyOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: cookieExtractor,
   secretOrKey: process.env.JWT_SECRET || 'secret'
 };
 
@@ -14,6 +23,10 @@ const passportConfig = (passport: any) => {
         const user = await client.user.findUnique({
           where: {
             id: payload.id
+          },
+          select: {
+            id: true,
+            username: true
           }
         });
 

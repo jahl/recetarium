@@ -29,7 +29,7 @@ export const logIn = async (request: Request, response: Response) => {
 
   try {
     const user = await client.user.findUnique({
-      where: { username }
+      where: { username },
     });
     if (!user) {
       response.status(401).json({ error: 'invalid username or password'});
@@ -52,9 +52,25 @@ export const logIn = async (request: Request, response: Response) => {
       }
     );
 
-    response.json({ token });
+    response.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600000
+    });
+
+    response.json({ user: { username: user.username, id: user.id } });
   } catch (error) {
     console.log(error);
     response.status(500).json({ error: `There was an error logging you in: ${error}`});
   }
+};
+
+export const logOut = async (request: Request, response: Response) => {
+  response.clearCookie('token');
+  response.json({ message: 'Logged out' });
+}
+
+export const getCurrentUser = async (request: Request, response: Response) => {
+  response.json({ user: request.user });
 };

@@ -10,6 +10,6 @@ COPY . .
 
 RUN npm install -g nodemon
 
-EXPOSE 3000
+EXPOSE 3001
 
 CMD ["nodemon", "src/server.ts"]
