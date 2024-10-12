@@ -1,0 +1,27 @@
+
+volumes:
+  postgres_data:
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/app
+    env_file:
+      - ./server/.env
+
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - ${RECETARIUM_PG_PORT:-5432}:5432
+    environment:
+      POSTGRES_PASSWORD: Recetarium
+
