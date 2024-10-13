@@ -3,8 +3,12 @@ import { Request, Response } from "express";
 import client from '../config/client';
 
 export const indexRecipes = async (request: Request, response: Response) => {
+  const searchTerm = <string>request.query.search_term;
   try {
     const recipes = await client.recipe.findMany({
+      where: {
+        title: { contains: searchTerm, mode: 'insensitive' }
+      },
       select: {
         id: true,
         title: true

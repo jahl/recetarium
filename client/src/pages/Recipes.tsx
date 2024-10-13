@@ -1,34 +1,46 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { logOut } from '../api/auth';
+import { useNavigate } from 'react-router-dom';
+import AsyncSelect from 'react-select/async';
+import TRecipe from '../types/t_recipe';
+import { getRecipes } from '../api/recipes';
+import NavBar from '../components/NavBar';
 
 const Recipes = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { user, setUser } = useAuth();
 
-  const onLogOut = async () => {
-    try {
-      await logOut();
-      setUser(null);
-      navigate('/');
-    } catch (error) {
-      console.log('There was an issue logging you out:', error);
-    }
+  const fetchRecipes = (searchTerm : string) => {
+      return getRecipes(searchTerm).then((response) => {
+        return response.data.recipes.map((recipe : TRecipe) => {
+          return { value: recipe.id, label: recipe.title };
+        });
+      }).catch((error) => {
+      console.log('There was an error processing the request:', error);
+      });
+  };
+
+  const onOptionSelected = (option : any) => {
+    if (!option) return;
+
+    navigate(`/recipes/${option.value}`);
   };
 
   return (
-    <div id="recipes" className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-      <button onClick={onLogOut}>Log Out</button>
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h1 className="text-6xl text-center min-w-full block py-5">
-          Recetarium 🍖
-        </h1>
-        <h2 className="mt-5 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          What are we cooking today, { user?.username}?
-        </h2>
-        <div>
-          <input type="text" name="search" placeholder="test" />
+    <div id="recipes" className="h-full divide-y">
+      <NavBar />
+      <div className="flex flex-row justify-center px-6 py-2 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <h2 className="mt-5 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            What are we cooking today, { user?.username }?
+          </h2>
+          <div className="py-5 text-gray-900">
+            <AsyncSelect
+              defaultOptions
+              loadOptions={fetchRecipes}
+              onChange={onOptionSelected}
+              placeholder={`Some food, for example: Quesadillas`}/>
+          </div>
         </div>
       </div>
     </div>

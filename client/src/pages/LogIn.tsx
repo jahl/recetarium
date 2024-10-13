@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logIn } from '../api/auth';
 import { useAuth } from '../contexts/AuthContext';
+import getRandomFoodEmoji from '../utils/getRandomEmoji';
 
 const LogIn = () => {
   const navigate = useNavigate();
-  const [username , setUsername] = useState('');
-  const [password , setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [emoji] = useState(getRandomFoodEmoji());
+
   const { setUser } = useAuth();
 
   const onSubmit = async () => {
@@ -24,7 +27,7 @@ const LogIn = () => {
     <div id="login" className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <span className="text-6xl text-center min-w-full block py-5">
-          🍖
+          {emoji}
         </span>
         <h1 className="text-3xl pt-3 text-center">
           Recetarium

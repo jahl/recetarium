@@ -1,5 +1,5 @@
 import axios from 'axios';
 
-export const IndexRecipes = () => {
-  return axios.get('/recipes/')
+export const getRecipes = async (searchTerm : string) => {
+  return await axios.get(`/recipes?search_term=${searchTerm}`);
 }

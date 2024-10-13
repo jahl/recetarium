@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import { query } from 'express-validator';
 
 import { registerUser, logIn, getCurrentUser, logOut } from '../controllers/auth_controller';
 import { indexUsers } from '../controllers/users_controller';
@@ -23,7 +24,7 @@ router.use('/users', userRouter);
 
 const recipeRouter = express.Router();
 recipeRouter.use(passport.authenticate('jwt', { session: false }));
-recipeRouter.get('/', indexRecipes);
+recipeRouter.get('/', query('search_term').trim().escape(), indexRecipes);
 recipeRouter.post('/', createRecipe);
 router.use('/recipes', recipeRouter);
 
