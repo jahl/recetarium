@@ -8,7 +8,7 @@ import getRandomFoodEmoji from '../utils/getRandomEmoji';
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const [emoji, setEmoji] = useState(getRandomFoodEmoji());
+  const [emoji] = useState(getRandomFoodEmoji());
   const { setUser } = useAuth();
 
   const onLogOut = async () => {

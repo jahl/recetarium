@@ -10,6 +10,7 @@ export const indexUsers = async (request: Request, response: Response) => {
         username: true
       }
     });
+
     response.status(200).json({ users: users });
   } catch (error) {
     console.log(error);

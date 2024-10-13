@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
-import TRecipe from '../types/t_recipe';
+import TRecipe from '../types/recipe';
 import { getRecipes } from '../api/recipes';
 import NavBar from '../components/NavBar';
 

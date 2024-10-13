@@ -2,6 +2,25 @@
 import { Request, Response } from "express";
 import client from '../config/client';
 
+export const getRecipe = async (request: Request, response: Response) => {
+  try {
+    const id = parseInt(request.params.id);
+    const recipe = await client.recipe.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        description: true
+      }
+    });
+
+    response.status(200).json({ recipe });
+  } catch (error) {
+    console.log(error);
+    response.status(400).json({ error: `There was an error processing your request: ${error}`});
+  }
+}
+
 export const indexRecipes = async (request: Request, response: Response) => {
   const searchTerm = <string>request.query.search_term;
   try {
@@ -14,6 +33,7 @@ export const indexRecipes = async (request: Request, response: Response) => {
         title: true
       }
     });
+
     response.status(200).json({ recipes: recipes });
   } catch (error) {
     console.log(error);
@@ -50,9 +70,30 @@ export const createRecipe = async (request: Request, response: Response) => {
         }
       }
     });
+
     response.status(201).json(recipe);
   } catch (error) {
     console.log(error);
     response.status(400).json({ error: `Recipe could not be created: ${error}`});
+  }
+}
+
+export const editRecipe = async (request: Request, response: Response) => {
+  const { id } = request.params;
+  const { title, description } = request.body;
+
+  try {
+    const recipe = await client.recipe.update({
+      where: { id: parseInt(id) },
+      data: {
+        title,
+        description
+      }
+    });
+
+    response.status(200).json({ recipe });
+  } catch (error) {
+    console.log(error);
+    response.status(400).json({ error: `Recipe could not be edited: ${error}`});
   }
 }

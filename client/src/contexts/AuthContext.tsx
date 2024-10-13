@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getCurrentUser } from '../api/auth';
-import TUser from '../types/t_user';
+import TUser from '../types/user';
 
 interface TAuthContext {
   user: TUser | null;
