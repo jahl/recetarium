@@ -36,7 +36,7 @@ model Ingredient {
 
 model IngredienstOnRecipes {
   id Int @id @default(autoincrement())
-  
+
   recipe Recipe @relation(fields: [recipeId], references: [id])
   recipeId Int
 
@@ -45,4 +45,6 @@ model IngredienstOnRecipes {
 
   quantity Decimal
   measuringUnit String
+
+  @@unique([recipeId, ingredientId])
 }
