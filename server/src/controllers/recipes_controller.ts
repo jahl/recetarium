@@ -10,7 +10,16 @@ export const getRecipe = async (request: Request, response: Response) => {
       select: {
         id: true,
         title: true,
-        description: true
+        description: true,
+        ingredients: {
+          select: {
+            quantity: true,
+            measuringUnit: true,
+            ingredientId: true,
+            recipeId: true,
+            ingredient: true
+          }
+        }
       }
     });
 
@@ -39,7 +48,7 @@ export const indexRecipes = async (request: Request, response: Response) => {
     console.log(error);
     response.status(400).json({ error: `There was an error processing your request: ${error}`});
   }
-};
+}
 
 export const createRecipe = async (request: Request, response: Response) => {
   const { title, ingredients } = request.body;
@@ -49,16 +58,7 @@ export const createRecipe = async (request: Request, response: Response) => {
       return {
         quantity: ingredient.quantity,
         measuringUnit: ingredient.measuringUnit,
-        ingredient: {
-          connectOrCreate: {
-            where: {
-              name: ingredient.name
-            },
-            create: {
-              name: ingredient.name
-            }
-          }
-        }
+        ingredientId: ingredient.ingredientId
       };
     });
 
@@ -80,14 +80,46 @@ export const createRecipe = async (request: Request, response: Response) => {
 
 export const editRecipe = async (request: Request, response: Response) => {
   const { id } = request.params;
-  const { title, description } = request.body;
+  const { title, description, ingredients } = request.body;
 
   try {
+    const recipeId = parseInt(id);
+    const oldIngredientIds = await client.ingredienstOnRecipes.findMany({ 
+      where: { recipeId },
+      select: { ingredientId: true }
+    });
+    const updatedIngredientIds = ingredients.map((ingredient : any) => ingredient.ingredientId);
+    const ingredientsToRemove = oldIngredientIds.filter((oldId : any) => !updatedIngredientIds.includes(oldId.ingredientId));
+
+    const ingredientAttributes = ingredients.map((ingredient : any) => {
+      return {
+        where: {
+          recipeId_ingredientId: { recipeId,  ingredientId: ingredient.ingredientId }
+        },
+        create: {
+          ingredientId: ingredient.ingredientId,
+          quantity: ingredient.quantity,
+          measuringUnit: ingredient.measuringUnit
+        },
+        update: {
+          quantity: ingredient.quantity,
+          measuringUnit: ingredient.measuringUnit
+        }
+      };
+    });
+
     const recipe = await client.recipe.update({
-      where: { id: parseInt(id) },
+      where: { id: recipeId },
       data: {
         title,
-        description
+        description,
+        ingredients: {
+          deleteMany: ingredientsToRemove.map((ingredientId) => ({
+            recipeId: recipeId,
+            ingredientId: ingredientId.ingredientId,
+          })),
+          upsert: ingredientAttributes
+        }
       }
     });
 
