@@ -6,17 +6,19 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Recipes from './pages/Recipes';
 import ShowRecipe from './pages/recipes/ShowRecipe';
 import EditRecipe from './pages/recipes/EditRecipe';
+import CreateRecipe from './pages/recipes/CreateRecipe';
 
 const App = () => {
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<ProtectedRoute element={<Recipes />} />} />
+          <Route path="/" element={<ProtectedRoute children={<Recipes />} />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/recipes">
-            <Route path=":id"  element={<ProtectedRoute element={<ShowRecipe />} />} />
-            <Route path=":id/edit"  element={<ProtectedRoute element={<EditRecipe />} />} />
+            <Route path="new"  element={<ProtectedRoute children={<CreateRecipe />} />} />
+            <Route path=":id"  element={<ProtectedRoute children={<ShowRecipe />} />} />
+            <Route path=":id/edit"  element={<ProtectedRoute children={<EditRecipe />} />} />
           </Route>
         </Routes>
       </AuthProvider>
