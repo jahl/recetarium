@@ -8,9 +8,18 @@ export const getRecipes = async (searchTerm : string) => {
   return await axios.get(`/recipes?search_term=${searchTerm}`);
 }
 
-export const editRecipe = async (id : string, title : string, description : string) => {
+export const createRecipe = async (title : string, description : string, ingredients : any[] ) => {
+  return await axios.post(`/recipes`, {
+    title,
+    description,
+    ingredients
+  });
+}
+
+export const editRecipe = async (id : string, title : string, description : string, ingredients : any[]) => {
   return await axios.put(`/recipes/${id}`, {
     title,
-    description
+    description,
+    ingredients
   });
 }
