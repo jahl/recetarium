@@ -1,50 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import { editRecipe, getRecipeById } from '../../api/recipes';
+import { createRecipe} from '../../api/recipes';
 import NavBar from '../../components/NavBar';
 import Editor from '../../components/Editor';
 import InlineEditor from '../../components/InlineEditor';
 import IngredientList from '../../components/IngredientList';
 import TRecipeIngredient from '../../types/recipe_ingredient';
 
-const EditRecipe = () => {
+const CreateRecipe = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState('New Recipe');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState<TRecipeIngredient[]>([]);
-
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchRecipe = async () => {
-      try {
-        const response = await getRecipeById(id);
-        const recipe = response.data.recipe;
-
-        setTitle(recipe.title);
-        setDescription(recipe.description);
-        setIngredients(recipe.ingredients);
-      } catch (error) {
-        console.error(error);
-        navigate('/');
-      }
-    };
-
-    fetchRecipe();
-  }, [id]);
 
   const onIngredientsUpdated = (updatedIngredients : TRecipeIngredient[]) => {
     setIngredients(updatedIngredients);
   }
 
   const onSubmit = async () => {
-    if (!id) return;
-
     try {
-      await editRecipe(id, title, description, ingredients);
-      navigate(`/recipes/${id}`);
+      const response = await createRecipe(title, description, ingredients);
+      navigate(`/recipes/${response.data.id}`);
     } catch (error) {
       console.error(error);
     }
@@ -71,4 +47,4 @@ const EditRecipe = () => {
   );
 };
 
-export default EditRecipe;
+export default CreateRecipe;
